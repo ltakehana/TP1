@@ -24,6 +24,24 @@
 
     A aplicação estará disponível em [http://localhost:8000](http://localhost:8000).
 
+4. **Como rodar os testes**
+    Para rodar os testes deve-se fazer a instalação das dependencias. Nesse caso, rode no diretorio:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+    
+    ou
+
+    ```
+    pip3 install -r requirements.txt
+    ```
+
+    Por fim, para rodar os testes basta rodar o comando:
+
+    ```
+    pytests
+    ```
 
 ## Estrutura do Projeto
 
