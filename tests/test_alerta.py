@@ -48,7 +48,7 @@ def setup_db():
     db.refresh(produto)
 
     lote_data = LoteSchema(
-        id = random.randint(1001, 1050),
+        id = random.randint(1001, 1500),
         quantidade= 15,
         produto_id= produto.id,
         data_validade= "2023-12-11T00:44:07.446Z"
@@ -62,31 +62,21 @@ def setup_db():
 
     return db, lote
 
-
-def test_emitir_alerta_um():
+@pytest.mark.parametrize("quantidade_ajuste, quantidade_final", [
+    (-10, 5),
+    (-11, 4),
+    (-12, 3)
+])
+def test_emitir_alerta(quantidade_ajuste, quantidade_final):
     db, lote = setup_db()
 
     terminal = io.StringIO()
     sys.stdout = terminal
 
-    body = {"quantidade": -10, "lote_id": lote.id}
+    body = {"quantidade": quantidade_ajuste, "lote_id": lote.id}
     response = client.post("/transacao/ajuste/", json=body)
 
     sys.stdout = sys.__stdout__
 
     saida_terminal = terminal.getvalue()
-    assert saida_terminal == "| Produto: Camiseta branca | Codigo de barras: 111 11 1111 | Custo: R$ 45,50 | Preco de Venda: R$ 60,00 | Quantidade Atual: 5 | Fornecedor: Nike |\n"
-
-def test_emitir_alerta_dois():
-    db, lote = setup_db()
-
-    terminal = io.StringIO()
-    sys.stdout = terminal
-
-    body = {"quantidade": -11, "lote_id": lote.id}
-    response = client.post("/transacao/ajuste/", json=body)
-
-    sys.stdout = sys.__stdout__
-
-    saida_terminal = terminal.getvalue()
-    assert saida_terminal == "| Produto: Camiseta branca | Codigo de barras: 111 11 1111 | Custo: R$ 45,50 | Preco de Venda: R$ 60,00 | Quantidade Atual: 4 | Fornecedor: Nike |\n"
+    assert saida_terminal == f"| Produto: Camiseta branca | Codigo de barras: 111 11 1111 | Custo: R$ 45,50 | Preco de Venda: R$ 60,00 | Quantidade Atual: {quantidade_final} | Fornecedor: Nike |\n"
