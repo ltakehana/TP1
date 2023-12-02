@@ -28,7 +28,7 @@ def test_consultar_estoque():
     db.commit()
     db.refresh(produto_db)
 
-    response = client.get('coluna/' + str(produto_db.id) + '/')
+    response = client.get('estoque/' + str(produto_db.id) + '/')
     
     assert response.status_code == 200
     assert response.json() == {"quantidade": produto_db.quantidade_disponivel}
