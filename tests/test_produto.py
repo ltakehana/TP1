@@ -17,14 +17,13 @@ def test_cadastrar_produto():
         "codigo_barras": "123456789",
         "custo": 10.0,
         "preco_venda": 20.0,
-        "quantidade_disponivel": 50,
-        "categoria_id": 1
+        "quantidade_disponivel": 50
     }
 
-    response = client.post("/cadastrar_produto", json=produto_data)
+    response = client.post("/produto/", json=produto_data)
 
     assert response.status_code == 200
-    assert response.json()["mensagem"] == "Produto cadastrado com sucesso!"
+    assert response.json() == produto_data
 
     db.close()
 
@@ -37,11 +36,10 @@ def test_cadastrar_produto_com_descricao_em_branco():
         "codigo_barras": "123456789",
         "custo": 10.0,
         "preco_venda": 20.0,
-        "quantidade_disponivel": 50,
-        "categoria_id": 1
+        "quantidade_disponivel": 50
     }
 
-    response = client.post("/cadastrar_produto", json=produto_data)
+    response = client.post("/produto/", json=produto_data)
 
     assert response.status_code == 400
     assert "Descrição, código de barras, custo, preço de venda e quantidade disponível são obrigatórios." in response.text
@@ -56,11 +54,10 @@ def test_cadastrar_produto_com_valores_invalidos():
         "codigo_barras": "123456789",
         "custo": -5.0,  # Valor inválido
         "preco_venda": 0.0,  # Valor inválido
-        "quantidade_disponivel": -10,  # Valor inválido
-        "categoria_id": 1
+        "quantidade_disponivel": -10  # Valor inválido
     }
 
-    response = client.post("/cadastrar_produto", json=produto_data)
+    response = client.post("/produto/", json=produto_data)
 
     assert response.status_code == 400
     assert "Custo, preço de venda e quantidade disponível devem ser maiores que zero." in response.text
