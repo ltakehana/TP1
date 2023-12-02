@@ -64,7 +64,7 @@ class TransacaoController:
                     raise ValorInvalidoException("Quantidade de venda maior do que a disponível no produto.")
 
                 if (produto_db.quantidade_disponivel + transacao.quantidade) <= produto_db.quantidade_minima:
-                    self.emitir_alerta()
+                    self.emitir_alerta(produto_db, transacao.quantidade)
 
                 lote_db.quantidade += transacao.quantidade
                 db.commit()
@@ -95,5 +95,5 @@ class TransacaoController:
         except CampoObrigatorioException as exc:
             raise HTTPException(status_code=404, detail=str(exc))
 
-    def emitir_alerta(self):
-        print("| Produto: Camiseta branca | Codigo de barras: 111 11 1111 | Custo: R$ 45,50 | Preco de Venda: R$ 60,00 | Quantidade Atual: 5 | Fornecedor: Nike |")
+    def emitir_alerta(self, produto_db, transacao_quantidade):
+        print(f"| Produto: Camiseta branca | Codigo de barras: 111 11 1111 | Custo: R$ 45,50 | Preco de Venda: R$ 60,00 | Quantidade Atual: {produto_db.quantidade_disponivel + transacao_quantidade} | Fornecedor: Nike |")
