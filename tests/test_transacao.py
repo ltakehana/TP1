@@ -46,7 +46,7 @@ def setup_db():
     db.refresh(produto)
 
     lote_data = LoteSchema(
-        id= random.randint(0,1000),
+        id= random.randint(1,1000),
         quantidade= 20,
         produto_id= produto.id,
         data_validade= "2023-12-11T00:44:07.446Z"
