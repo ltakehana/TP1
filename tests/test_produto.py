@@ -42,8 +42,7 @@ def test_cadastrar_produto_com_descricao_em_branco():
     response = client.post("/produto/", json=produto_data)
 
     assert response.status_code == 400
-    assert "Descrição, código de barras, custo, preço de venda e quantidade disponível são obrigatórios." in response.text
-
+    assert response.json() == {"detail":"Descrição, código de barras, custo, preço de venda e quantidade disponível são obrigatórios."}
     db.close()
 
 def test_cadastrar_produto_com_valores_invalidos():
@@ -60,6 +59,7 @@ def test_cadastrar_produto_com_valores_invalidos():
     response = client.post("/produto/", json=produto_data)
 
     assert response.status_code == 400
-    assert "Custo, preço de venda e quantidade disponível devem ser maiores que zero." in response.text
+    assert response.json() == {"detail":"Custo, preço de venda e quantidade disponível devem ser maiores que zero."}
+
 
     db.close()
