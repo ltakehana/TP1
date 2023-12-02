@@ -6,4 +6,3 @@ class ProdutoSchema(BaseModel):
     custo: float
     preco_venda: float
     quantidade_disponivel: int
-    categoria_id: int
