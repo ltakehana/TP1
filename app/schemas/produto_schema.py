@@ -7,3 +7,4 @@ class ProdutoSchema(BaseModel):
     preco_venda: float
     quantidade_disponivel: int
     filial_id: int
+    quantidade_disponivel: int
