@@ -25,22 +25,9 @@
     A aplicação estará disponível em [http://localhost:8000](http://localhost:8000).
 
 4. **Como rodar os testes**
-    Para rodar os testes deve-se fazer a instalação das dependencias. Nesse caso, rode no diretorio:
+    Para rodar os testes deve-se estar com o container em execução, após isso, executar o comando de testes dentro do container:
 
-    ```bash
-    pip install -r requirements.txt
-    ```
-    
-    ou
-
-    ```
-    pip3 install -r requirements.txt
-    ```
-
-    Por fim, para rodar os testes basta rodar o comando:
-
-    ```
-    pytests
+    ```sudo docker exec -it tp1_app_1 pytest
     ```
 
 ## Estrutura do Projeto
