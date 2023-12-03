@@ -29,6 +29,11 @@ def create_produto(produto: ProdutoSchema, db: Session = Depends(get_db)):
     return produto_controller.create_produto(db, produto)
 
 
+@app.get("/produto/{produto}/", response_model=ProdutoSchema)
+def read_produto(produto: str, db: Session = Depends(get_db)):
+    return produto_controller.read_produto(db, produto)
+
+
 @app.get("/estoque/{produto}/")
 def contar_estoque(produto: str, db: Session = Depends(get_db)):
     return quantidade_valor_controller.quantidade_estoque(db, produto)

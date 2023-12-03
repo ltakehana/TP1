@@ -2,6 +2,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.database import SessionLocal, engine, Base
 from app.views.produto_view import ProdutoView
+from app.schemas.produto_schema import ProdutoSchema   
+from app.models.produto_model import ProdutoModel     
 
 client = TestClient(app)
 
@@ -83,9 +85,11 @@ def test_consultar_produto():
     db.refresh(produto_db)
 
     response = client.get('produto/' + produto_db.codigo_barras + '/')
-    
+
+    produto_view = ProdutoView()
+
     assert response.status_code == 200
-    assert response.json() == ProdutoView(produto)
+    assert response.json() == produto_view.format_response(produto)
     
     db.close()
     

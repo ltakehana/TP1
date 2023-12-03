@@ -4,6 +4,7 @@ from app.schemas.produto_schema import ProdutoSchema
 from app.views.produto_view import ProdutoView
 from app.exceptions import DescricaoEmBrancoException,ValorInvalidoException
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from fastapi import HTTPException
 
 
@@ -27,3 +28,13 @@ class ProdutoController:
             raise HTTPException(status_code=400, detail=str(exc))
         except ValorInvalidoException as exc:
             raise HTTPException(status_code=400, detail=str(exc))
+
+
+    def read_produto(self, db: Session, produto):
+        produto_db = db.query(ProdutoModel).filter(
+            or_(
+                ProdutoModel.descricao == produto,
+                ProdutoModel.codigo_barras == produto
+            )
+        ).first()
+        return self.produto_view.format_response(produto_db)
