@@ -120,7 +120,7 @@ def test_consultar_produto():
     db.close()
     
 
-def test_consultar_produto_codigo_barras():
+def test_consultar_produto_codigo_barras1():
     db = setup_db()
     
     produto = ProdutoSchema(
@@ -145,14 +145,13 @@ def test_consultar_produto_codigo_barras():
     
     db.close()
     
-
-def test_consultar_produto_descricao():
+def test_consultar_produto_codigo_barras2():
     db = setup_db()
     
     produto = ProdutoSchema(
-        codigo_barras= "111 000 010 11",
+        codigo_barras= "111 000 01002",
         custo= 50.00,
-        descricao="Mais um Teste",
+        descricao="Mais um Teste de novo",
         preco_venda= 80.00,
         quantidade_disponivel= 10
     )
@@ -162,7 +161,7 @@ def test_consultar_produto_descricao():
     db.commit()
     db.refresh(produto_db)
 
-    response = client.get('produto/' + produto_db.descricao + '/')
+    response = client.get('produto/' + produto_db.codigo_barras + '/')
 
     produto_view = ProdutoView()
 
@@ -170,4 +169,3 @@ def test_consultar_produto_descricao():
     assert response.json() == produto_view.format_response(produto)
     
     db.close()
-    
