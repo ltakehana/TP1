@@ -1,13 +1,9 @@
 
 from app.models.produto_model import ProdutoModel
 from app.models.transacao_model import TransacaoModel, TransacaoRecebimentoModel, TransacaoTransferenciaModel
-from app.schemas.produto_schema import ProdutoSchema
-from app.exceptions import DescricaoEmBrancoException, ValorInvalidoException
 from app.schemas.transacao_schema import TransacaoRecebimentoSchema, TransacaoSchema, TransacaoTransferenciaSchema
 from app.views.produto_view import ProdutoView
-from app.views.transacao_view import TransacaoView
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
 
 
 class TransacaoController:
@@ -15,29 +11,69 @@ class TransacaoController:
         self.transacao_view = ProdutoView()
 
     def recebimento_produto(self, db: Session, transacao: TransacaoRecebimentoSchema):
-        produto = ProdutoModel(descricao="Produto Teste", codigo_barras="QWERTY", custo=1.0, preco_venda=5.0, quantidade_disponivel=15, filial_id=1)
+        produto_db = db.query(ProdutoModel).filter(
+            ProdutoModel.codigo_barras == transacao.codigo_barras and ProdutoModel.filial_id == transacao.filial_id).first()
+        produto_db.quantidade_disponivel += transacao.quantidade
 
-        return self.transacao_view.format_response(produto)
-    
+        transacao_db = TransacaoRecebimentoModel(quantidade=transacao.quantidade, produto_id=produto_db.id,
+                                                 fornecedor_id=transacao.fornecedor_id, filial_id=transacao.filial_id)
+
+        db.add(transacao_db)
+        db.add(produto_db)
+        db.commit()
+        db.refresh(produto_db)
+
+        return self.transacao_view.format_response(produto_db)
+
     def transacao_produto(self, db: Session, transacao: TransacaoSchema):
         if transacao.tipo == "ajustes":
-            produto = ProdutoModel(descricao="Produto Teste", codigo_barras="QWERTY", custo=1.0, preco_venda=5.0, quantidade_disponivel=5, filial_id=1)
+            produto_db = db.query(ProdutoModel).filter(
+                ProdutoModel.codigo_barras == transacao.codigo_barras and ProdutoModel.filial_id == transacao.filial_id).first()
+            produto_db.quantidade_disponivel = transacao.quantidade
         elif transacao.tipo == "devolucao":
-            produto = ProdutoModel(descricao="Produto Teste", codigo_barras="QWERTY", custo=1.0, preco_venda=5.0, quantidade_disponivel=15, filial_id=1)
+            produto_db = db.query(ProdutoModel).filter(
+                ProdutoModel.codigo_barras == transacao.codigo_barras and ProdutoModel.filial_id == transacao.filial_id).first()
+            produto_db.quantidade_disponivel += transacao.quantidade
         else:
-            produto = ProdutoModel(descricao="Produto Teste", codigo_barras="QWERTY", custo=1.0, preco_venda=5.0, quantidade_disponivel=5, filial_id=1)
+            produto_db = db.query(ProdutoModel).filter(
+                ProdutoModel.codigo_barras == transacao.codigo_barras and ProdutoModel.filial_id == transacao.filial_id).first()
+            produto_db.quantidade_disponivel -= transacao.quantidade
 
-        return self.transacao_view.format_response(produto)
-    
+        transacao_db = TransacaoModel(quantidade=transacao.quantidade, produto_id=produto_db.id,
+                                      tipo=transacao.tipo, filial_id=transacao.filial_id)
+
+        db.add(transacao_db)
+        db.add(produto_db)
+        db.commit()
+        db.refresh(produto_db)
+
+        return self.transacao_view.format_response(produto_db)
+
     def transferencia_produto(self, db: Session, transacao: TransacaoTransferenciaSchema):
         lista = []
 
-        produtoA = ProdutoModel(descricao="Produto Teste", codigo_barras="QWERTY", custo=1.0, preco_venda=5.0, quantidade_disponivel=5, filial_id=1)
-        produtoB = ProdutoModel(descricao="Produto Teste", codigo_barras="QWERTY", custo=1.0, preco_venda=5.0, quantidade_disponivel=15, filial_id=2)
-        
+        produtoA = db.query(ProdutoModel).filter(
+            ProdutoModel.codigo_barras == transacao.codigo_barras and ProdutoModel.filial_id == transacao.filial_origem).first()
+        produtoB = db.query(ProdutoModel).filter(
+            ProdutoModel.codigo_barras == transacao.codigo_barras and ProdutoModel.filial_id == transacao.filial_destino).first()
+
+        produtoA.quantidade_disponivel -= transacao.quantidade
+        produtoB.quantidade_disponivel += transacao.quantidade
+
+        transacao_db = TransacaoTransferenciaModel(quantidade=transacao.quantidade, produto_origem=produtoA.id,
+                                                   produto_destino=produtoB.id, filial_origem=transacao.filial_origem, filial_destino=transacao.filial_destino)
+
+        db.add(transacao_db)
+        db.add(produtoA)
+        db.add(produtoB)
+        db.commit()
+        db.refresh(produtoA)
+        db.refresh(produtoB)
+
         lista.append(produtoA)
         lista.append(produtoB)
 
-        lista_produtos_view = [self.transacao_view.format_response(produto_model) for produto_model in lista]
+        lista_produtos_view = [self.transacao_view.format_response(
+            produto_model) for produto_model in lista]
 
         return lista_produtos_view
