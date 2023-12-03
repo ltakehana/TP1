@@ -11,3 +11,6 @@ class ProdutoModel(Base):
     custo = Column(Float)
     preco_venda = Column(Float)
     quantidade_disponivel = Column(Integer)
+
+    filial_id = Column(Integer, ForeignKey("filiais.id"))
+  

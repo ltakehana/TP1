@@ -17,7 +17,8 @@ def test_cadastrar_produto():
         "codigo_barras": "123456789",
         "custo": 10.0,
         "preco_venda": 20.0,
-        "quantidade_disponivel": 50
+        "quantidade_disponivel": 50,
+        "filial_id": 1
     }
 
     response = client.post("/produto/", json=produto_data)
@@ -36,7 +37,8 @@ def test_cadastrar_produto_com_descricao_em_branco():
         "codigo_barras": "123456789",
         "custo": 10.0,
         "preco_venda": 20.0,
-        "quantidade_disponivel": 50
+        "quantidade_disponivel": 50,
+        "filial_id": 1
     }
 
     response = client.post("/produto/", json=produto_data)
@@ -53,7 +55,8 @@ def test_cadastrar_produto_com_valores_invalidos():
         "codigo_barras": "123456789",
         "custo": -5.0,  # Valor inválido
         "preco_venda": 0.0,  # Valor inválido
-        "quantidade_disponivel": -10  # Valor inválido
+        "quantidade_disponivel": -10,  # Valor inválido
+        "filial_id": 1
     }
 
     response = client.post("/produto/", json=produto_data)

@@ -8,5 +8,6 @@ class ProdutoView:
             "codigo_barras": schema.codigo_barras,
             "custo": schema.custo,
             "preco_venda": schema.preco_venda,
-            "quantidade_disponivel": schema.quantidade_disponivel
+            "quantidade_disponivel": schema.quantidade_disponivel,
+            "filial_id": schema.filial_id,
         }
