@@ -5,3 +5,5 @@ class LoteSchema(BaseModel):
     quantidade: int
     produto_id: int
     data_validade: str
+
+    

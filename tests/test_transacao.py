@@ -20,6 +20,12 @@ client = TestClient(app)
 
 @pytest.mark.parametrize("data, expected_status_code, expected_response", [
     ({"tipo": "venda", "quantidade": 10, "lote_id": 2022}, 200, {"quantidade": 12}),
+    ({"tipo": "venda", "quantidade": 5, "lote_id": 2022}, 200, {"quantidade": 7}), 
+    ({"tipo": "recebimento", "quantidade": 13, "lote_id": 2022}, 200, {"quantidade": 20}), 
+    ({"tipo": "devolucao", "quantidade": 1, "lote_id": 2022}, 200, {"quantidade": 21}), 
+    ({"tipo": "transferencia", "quantidade": 10, "lote_id": 2022}, 200, {"quantidade": 11}), 
+    ({"tipo": "ajuste", "quantidade": 10, "lote_id": 2022}, 200, {"quantidade": 21}), 
+    ({"tipo": "ajuste", "quantidade": -1, "lote_id": 2022}, 200, {"quantidade": 20}), 
 ])
 
 
