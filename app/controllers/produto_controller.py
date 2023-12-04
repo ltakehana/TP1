@@ -29,9 +29,10 @@ class ProdutoController:
                 custo=  produto.custo,
                 descricao=produto.descricao,
                 preco_venda= produto.preco_venda,
-                quantidade_disponivel= produto.quantidade_disponivel
+                quantidade_disponivel= produto.quantidade_disponivel,
+                fornecedor_id= produto.fornecedor_id
             )
-            
+
             produto_db = ProdutoModel(**produto_schema.dict())
             db.add(produto_db)
             db.commit()
@@ -44,9 +45,9 @@ class ProdutoController:
                 produto_id= produto_db.id,
                 data_validade= produto.validade
             )
-            
+
             lote_db=LoteModel(**lote_data.dict())
-    
+
             db.add(lote_db)
             db.commit()
             db.refresh(lote_db)

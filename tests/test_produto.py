@@ -2,38 +2,57 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.database import SessionLocal, engine, Base
 from app.views.produto_view import ProdutoView
-from app.schemas.produto_schema import ProdutoSchema,ProdutoCreationSchema 
-from app.models.produto_model import ProdutoModel     
+from app.schemas.produto_schema import ProdutoSchema,ProdutoCreationSchema
+from app.models.produto_model import ProdutoModel
+from app.schemas.fornecedor_schema import FornecedorSchema
+from app.models.fornecedor_model import FornecedorModel
 
 client = TestClient(app)
 
 def setup_db():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
-    return db
+
+    fornecedor_data = FornecedorSchema(
+    nome= "Fornecedor A",
+    endereco= "Rua A",
+    telefone= "61 9 9999-9999"
+    )
+
+    fornecedor = FornecedorModel(**fornecedor_data.dict())
+    db.add(fornecedor)
+    db.commit()
+    db.refresh(fornecedor)
+
+    return db, fornecedor
+
 
 def test_cadastrar_produto():
-    db = setup_db()
+    db, fornecedor = setup_db()
 
     produto_data = {
-        "descricao": "Produto Teste",
+        "descricao": "Produto Teste 1",
         "codigo_barras": "123456789",
         "custo": 10.0,
         "preco_venda": 20.0,
         "quantidade_disponivel": 50,
         "lote": 1232132,
-        "validade":"05/2023"
+        "validade":"05/2023",
+        "quantidade_minima": 1,
+        "fornecedor_id": fornecedor.id
     }
 
     response = client.post("/produto/", json=produto_data)
 
 
     produto_data = {
-        "descricao": "Produto Teste",
+        "descricao": "Produto Teste 1",
         "codigo_barras": "123456789",
         "custo": 10.0,
         "preco_venda": 20.0,
-        "quantidade_disponivel": 50
+        "quantidade_disponivel": 50,
+        "fornecedor_id": fornecedor.id,
+        "quantidade_minima": 1
     }
 
     assert response.status_code == 200
@@ -43,7 +62,7 @@ def test_cadastrar_produto():
 
 
 def test_cadastrar_produto_com_descricao_em_branco():
-    db = setup_db()
+    db, fornecedor = setup_db()
 
     produto_data = {
         "descricao": "",  # Descrição em branco
@@ -52,7 +71,8 @@ def test_cadastrar_produto_com_descricao_em_branco():
         "preco_venda": 20.0,
         "quantidade_disponivel": 50,
         "lote": 1232132,
-        "validade":"05/2023"
+        "validade":"05/2023",
+        "fornecedor_id": fornecedor.id
     }
 
     response = client.post("/produto/", json=produto_data)
@@ -62,16 +82,17 @@ def test_cadastrar_produto_com_descricao_em_branco():
     db.close()
 
 def test_cadastrar_produto_com_valores_invalidos():
-    db = setup_db()
+    db, fornecedor = setup_db()
 
     produto_data = {
-        "descricao": "Produto Teste",
+        "descricao": "Produto Teste 2",
         "codigo_barras": "123456789",
         "custo": -5.0,  # Valor inválido
         "preco_venda": 0.0,  # Valor inválido
-        "quantidade_disponivel": -10,
         "lote": 1232132,
-        "validade":"05/2023"
+        "validade":"05/2023",
+        "quantidade_disponivel": -10,  # Valor inválido
+        "fornecedor_id": fornecedor.id
     }
 
     response = client.post("/produto/", json=produto_data)
@@ -84,14 +105,15 @@ def test_cadastrar_produto_com_valores_invalidos():
 
 
 def test_consultar_produto():
-    db = setup_db()
-    
+    db, fornecedor = setup_db()
+
     produto = ProdutoSchema(
         codigo_barras= "111 000 010 11",
         custo= 50.00,
-        descricao="Mais um Teste",
+        descricao="Produto Teste 3",
         preco_venda= 80.00,
-        quantidade_disponivel= 10
+        quantidade_disponivel= 10,
+        fornecedor_id= fornecedor.id
     )
 
     produto_db = ProdutoModel(**produto.dict())
@@ -105,19 +127,20 @@ def test_consultar_produto():
 
     assert response.status_code == 200
     assert response.json() == produto_view.format_response(produto)
-    
+
     db.close()
-    
+
 
 def test_consultar_produto():
-    db = setup_db()
-    
+    db, fornecedor = setup_db()
+
     produto = ProdutoSchema(
         codigo_barras= "111 000 010 11",
         custo= 50.00,
-        descricao="Mais um Teste",
+        descricao="Produto Teste 4",
         preco_venda= 80.00,
-        quantidade_disponivel= 10
+        quantidade_disponivel= 10,
+        fornecedor_id= fornecedor.id
     )
 
     produto_db = ProdutoModel(**produto.dict())
@@ -131,19 +154,20 @@ def test_consultar_produto():
 
     assert response.status_code == 200
     assert response.json() == produto_view.format_response(produto)
-    
+
     db.close()
-    
+
 
 def test_consultar_produto_codigo_barras1():
-    db = setup_db()
-    
+    db, fornecedor = setup_db()
+
     produto = ProdutoSchema(
-        codigo_barras= "111 000 010 11",
+        codigo_barras= "111 000 010 11 1",
         custo= 50.00,
-        descricao="Mais um Teste",
+        descricao="Produto Teste 5",
         preco_venda= 80.00,
-        quantidade_disponivel= 10
+        quantidade_disponivel= 10,
+        fornecedor_id= fornecedor.id
     )
 
     produto_db = ProdutoModel(**produto.dict())
@@ -157,18 +181,19 @@ def test_consultar_produto_codigo_barras1():
 
     assert response.status_code == 200
     assert response.json() == produto_view.format_response(produto)
-    
+
     db.close()
-    
+
 def test_consultar_produto_codigo_barras2():
-    db = setup_db()
-    
+    db, fornecedor = setup_db()
+
     produto = ProdutoSchema(
         codigo_barras= "111 000 01002",
         custo= 50.00,
-        descricao="Mais um Teste de novo",
+        descricao="Produto Teste 6",
         preco_venda= 80.00,
-        quantidade_disponivel= 10
+        quantidade_disponivel= 10,
+        fornecedor_id= fornecedor.id
     )
 
     produto_db = ProdutoModel(**produto.dict())
@@ -182,18 +207,19 @@ def test_consultar_produto_codigo_barras2():
 
     assert response.status_code == 200
     assert response.json() == produto_view.format_response(produto)
-    
+
     db.close()
 
 def test_consultar_produto_descricao():
-    db = setup_db()
-    
+    db, fornecedor = setup_db()
+
     produto = ProdutoSchema(
         codigo_barras= "111 000 010 11",
         custo= 50.00,
-        descricao="Mais um Teste",
+        descricao="Produto Teste 7",
         preco_venda= 80.00,
-        quantidade_disponivel= 10
+        quantidade_disponivel= 10,
+        fornecedor_id= fornecedor.id
     )
 
     produto_db = ProdutoModel(**produto.dict())
@@ -207,21 +233,22 @@ def test_consultar_produto_descricao():
 
     assert response.status_code == 200
     assert response.json() == produto_view.format_response(produto)
-    
+
     db.close()
-    
+
 
 def test_consultar_produto_sem_descricao():
-    db = setup_db()
-    
+    db, fornecedor = setup_db()
+
     produto = ProdutoSchema(
         codigo_barras= "111 000 000 000",
         custo= 100.00,
         descricao="",
         preco_venda= 120.00,
-        quantidade_disponivel= 10
+        quantidade_disponivel= 10,
+        fornecedor_id= fornecedor.id
     )
-    
+
     produto_db = ProdutoModel(**produto.dict())
     db.add(produto_db)
     db.commit()
@@ -232,19 +259,20 @@ def test_consultar_produto_sem_descricao():
 
     assert response.status_code == 400
     assert response.json() == {"detail":"Descrição, código de barras, custo, preço de venda e quantidade disponível são obrigatórios."}
-    
+
     db.close()
-    
+
 
 def test_consultar_produto_Codigo_Incorreto():
-    db = setup_db()
-    
+    db, fornecedor = setup_db()
+
     produto = ProdutoSchema(
         codigo_barras= "99 000 9 11",
         custo= 50.00,
-        descricao="Mais um Outro Teste",
+        descricao="Produto Teste 9",
         preco_venda= 80.00,
-        quantidade_disponivel= 10
+        quantidade_disponivel= 10,
+        fornecedor_id= fornecedor.id
     )
 
     produto_db = ProdutoModel(**produto.dict())
@@ -258,6 +286,5 @@ def test_consultar_produto_Codigo_Incorreto():
 
     assert response.status_code == 400
     assert response.json() == {"detail":"Não foi encontrado nenhum seletor com tal id."}
-    
+
     db.close()
-    
