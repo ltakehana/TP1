@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.schemas.transacao_schema import TransacaoSchema, TransacaoCreationSchema
 from app.models.transacao_model import TransacaoModel
+from app.models.lote_model import LoteModel
+from app.models.produto_model import ProdutoModel
 from app.views.transacao_view import TransacaoView
 from app.exceptions import CampoObrigatorioException, ValorInvalidoException
 
@@ -11,7 +13,7 @@ class TransacaoController:
 
     def create_transacao(self, db: Session, tipo, transacao: TransacaoCreationSchema):
         try:
-            if transacao.quantidade <= 0 or transacao.lote_id <= 0:
+            if (transacao.lote_id <= 0) or (transacao.quantidade<=0 and tipo!="ajuste"):
                 raise ValorInvalidoException("A quantidade e o lote devem ser maiores que zero.")
 
             if not tipo:
@@ -52,9 +54,6 @@ class TransacaoController:
 
                 if lote_db is None:
                     raise CampoObrigatorioException("Lote não encontrado.")
-
-                if lote_db.quantidade < transacao.quantidade:
-                    raise ValorInvalidoException("Quantidade de venda maior do que a disponível no lote.")
 
                 lote_db.quantidade += transacao.quantidade
                 db.commit()
