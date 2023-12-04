@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
+
 from app.database import Base
+from app.models.fornecedor_model import FornecedorModel
 
 class ProdutoModel(Base):
     __tablename__ = "produtos"
@@ -11,3 +13,7 @@ class ProdutoModel(Base):
     custo = Column(Float)
     preco_venda = Column(Float)
     quantidade_disponivel = Column(Integer)
+    quantidade_minima = Column(Integer)
+
+    fornecedor_id = Column(Integer, ForeignKey(FornecedorModel.id))
+    fornecedor = relationship("FornecedorModel", back_populates="produtos")

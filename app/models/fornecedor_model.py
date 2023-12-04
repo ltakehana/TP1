@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 class FornecedorModel(Base):
@@ -8,3 +9,5 @@ class FornecedorModel(Base):
     nome = Column(String, index=True)
     endereco = Column(String)
     telefone = Column(String)
+
+    produtos = relationship("ProdutoModel", back_populates="fornecedor")
