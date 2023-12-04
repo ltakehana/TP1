@@ -14,3 +14,14 @@ class ValorIdNaoEncontrado(Exception):
     def __init__(self, message="Não foi encontrado nenhum seletor com tal id."):
         self.message = message
         super().__init__(self.message)
+        
+
+class FaltaLoteException(Exception):
+    def __init__(self, message="É necessário especificar um lote"):
+        self.message = message
+        super().__init__(self.message)
+
+class CampoObrigatorioException(Exception):
+    def __init__(self, message="Campo obrigatório não fornecido."):
+        self.message = message
+        super().__init__(self.message)

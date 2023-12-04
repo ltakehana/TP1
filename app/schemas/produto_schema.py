@@ -6,3 +6,8 @@ class ProdutoSchema(BaseModel):
     custo: float
     preco_venda: float
     quantidade_disponivel: int
+    
+
+class ProdutoCreationSchema(ProdutoSchema):
+    lote: int
+    validade: str

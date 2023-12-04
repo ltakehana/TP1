@@ -44,3 +44,11 @@ Exemplos de mensagens de commit:
 - `feat: adiciona nova funcionalidade`
 - `fix: corrige um bug`
 - `chore: realiza tarefas de manutenção`
+
+
+## Equipe
+- Brenno Oliveira Silva : 190025379
+- Eduardo Afonso Dutra Silva  : 190012307
+- Gabriel Sabanai Trindade : 190028122
+- Leonardo de Souza Takehana : 232022952
+- Paulo Vitor Silva Abi Acl : 190047968

@@ -9,5 +9,5 @@ class TransacaoModel(Base):
     id = Column(Integer, primary_key=True, index=True)
     tipo = Column(String, index=True)
     quantidade = Column(Integer)
-    produto_id = Column(Integer, ForeignKey("produtos.id"))
+    lote_id = Column(Integer, ForeignKey("lotes.id"))
     data = Column(DateTime, default=datetime.utcnow)

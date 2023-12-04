@@ -1,14 +1,17 @@
 from fastapi import FastAPI, Depends  
 from sqlalchemy.orm import Session
 from app.controllers.produto_controller import ProdutoController
+from app.controllers.transacao_controller import TransacaoController
 from app.controllers.rastreamento_controller import RastreamentoController
 from app.controllers.quantidade_valor_controller import QuantidadeValorController
-from app.schemas.produto_schema import ProdutoSchema
+from app.schemas.produto_schema import ProdutoSchema,ProdutoCreationSchema
+from app.schemas.transacao_schema import TransacaoSchema,TransacaoCreationSchema 
 from app.schemas.lote_schema import LoteSchema
 from app.database import engine, SessionLocal, Base
 
 app = FastAPI()
 produto_controller = ProdutoController()
+transacao_controller = TransacaoController()
 rastreamento_controller = RastreamentoController()
 quantidade_valor_controller = QuantidadeValorController()
 
@@ -28,7 +31,7 @@ def read_root():
     return {"message":"Hello World!"}
 
 @app.post("/produto/", response_model=ProdutoSchema)
-def create_produto(produto: ProdutoSchema, db: Session = Depends(get_db)):
+def create_produto(produto: ProdutoCreationSchema, db: Session = Depends(get_db)):
     return produto_controller.create_produto(db, produto)
 
 @app.post("/lote/", response_model=LoteSchema)
@@ -42,6 +45,15 @@ def quantidade_produto_lote(lote_id: int, db: Session = Depends(get_db)):
 @app.get("/produto/{produto}/", response_model=ProdutoSchema)
 def read_produto(produto: str, db: Session = Depends(get_db)):
     return produto_controller.read_produto(db, produto)
+
+
+@app.get("/transacao/{transacao_id}")
+def read_transacao(transacao_id: int, db: Session = Depends(get_db)):
+    return transacao_controller.read_transacao(db, transacao_id)
+
+@app.post("/transacao/{tipo}/")
+def create_transacao(tipo: str, transacao: TransacaoCreationSchema, db: Session = Depends(get_db)):
+    return transacao_controller.create_transacao(db, tipo, transacao)
 
 
 @app.get("/estoque/{produto}/")
