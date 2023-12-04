@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.controllers.produto_controller import ProdutoController
 from app.controllers.rastreamento_controller import RastreamentoController
 from app.controllers.quantidade_valor_controller import QuantidadeValorController
-from app.schemas.produto_schema import ProdutoSchema
+from app.schemas.produto_schema import ProdutoSchema,ProdutoCreationSchema
 from app.schemas.lote_schema import LoteSchema
 from app.database import engine, SessionLocal, Base
 
@@ -28,7 +28,7 @@ def read_root():
     return {"message":"Hello World!"}
 
 @app.post("/produto/", response_model=ProdutoSchema)
-def create_produto(produto: ProdutoSchema, db: Session = Depends(get_db)):
+def create_produto(produto: ProdutoCreationSchema, db: Session = Depends(get_db)):
     return produto_controller.create_produto(db, produto)
 
 @app.post("/lote/", response_model=LoteSchema)

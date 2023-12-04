@@ -2,7 +2,7 @@ from app.models.lote_model import LoteModel
 from app.models.produto_model import ProdutoModel
 from app.schemas.lote_schema import LoteSchema
 from app.views.lote_view import LoteView
-from app.exceptions import ValorIdNaoEncontrado, ValorInvalidoException
+from app.exceptions import ValorIdNaoEncontrado, ValorInvalidoException,FaltaLoteException
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from sqlalchemy import func 
