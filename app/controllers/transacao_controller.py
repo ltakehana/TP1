@@ -5,7 +5,7 @@ from app.models.transacao_model import TransacaoModel
 from app.models.lote_model import LoteModel
 from app.models.produto_model import ProdutoModel
 from app.views.transacao_view import TransacaoView
-from app.exceptions import CampoObrigatorioException, ValorInvalidoException
+from app.exceptions import CampoObrigatorioException, ValorInvalidoException, EstoqueNegativoException
 
 class TransacaoController:
     def __init__(self):
@@ -63,9 +63,6 @@ class TransacaoController:
                 if produto_db.quantidade_disponivel < transacao.quantidade:
                     raise ValorInvalidoException("Quantidade de venda maior do que a disponível no produto.")
 
-                if (produto_db.quantidade_disponivel + transacao.quantidade) <= produto_db.quantidade_minima:
-                    self.emitir_alerta(produto_db, transacao.quantidade)
-
                 lote_db.quantidade += transacao.quantidade
                 db.commit()
                 db.refresh(lote_db)
@@ -74,6 +71,8 @@ class TransacaoController:
                 db.commit()
                 db.refresh(produto_db)
 
+                if produto_db.quantidade_disponivel <= produto_db.quantidade_minima:
+                    self.emitir_alerta(db, lote_db, produto_db,)
 
             return {"quantidade":lote_db.quantidade}
 
@@ -95,5 +94,16 @@ class TransacaoController:
         except CampoObrigatorioException as exc:
             raise HTTPException(status_code=404, detail=str(exc))
 
-    def emitir_alerta(self, produto_db, transacao_quantidade):
-        print(f"| Produto: Camiseta branca | Codigo de barras: 111 11 1111 | Custo: R$ 45,50 | Preco de Venda: R$ 60,00 | Quantidade Atual: {produto_db.quantidade_disponivel + transacao_quantidade} | Fornecedor: Nike |")
+    def emitir_alerta(self, db, lote_db, produto_db):
+        if produto_db.quantidade_disponivel < 0:
+            produto_db.quantidade_disponivel = 0
+            db.commit()
+            db.refresh(produto_db)
+
+            lote_db.quantidade_disponivel = 0
+            db.commit()
+            db.refresh(lote_db)
+
+            raise EstoqueNegativoException("O valor do estoque não pode ser menor que zero.")
+
+        print(f"| Produto: Camiseta branca | Codigo de barras: 111 11 1111 | Custo: R$ 45,50 | Preco de Venda: R$ 60,00 | Quantidade Atual: {produto_db.quantidade_disponivel} | Fornecedor: Nike |")

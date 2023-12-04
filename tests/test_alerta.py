@@ -13,7 +13,7 @@ from app.models.fornecedor_model import FornecedorModel
 from app.schemas.fornecedor_schema import FornecedorSchema
 from app.models.lote_model import LoteModel
 from app.schemas.lote_schema import LoteSchema
-
+from app.exceptions import EstoqueNegativoException
 
 client = TestClient(app)
 
@@ -80,3 +80,13 @@ def test_emitir_alerta(quantidade_ajuste, quantidade_final):
 
     saida_terminal = terminal.getvalue()
     assert saida_terminal == f"| Produto: Camiseta branca | Codigo de barras: 111 11 1111 | Custo: R$ 45,50 | Preco de Venda: R$ 60,00 | Quantidade Atual: {quantidade_final} | Fornecedor: Nike |\n"
+
+def teste_disparar_excecao():
+    db, lote = setup_db()
+
+    with pytest.raises(EstoqueNegativoException):
+
+        body = {"quantidade": -50, "lote_id": lote.id}
+        response = client.post("/transacao/ajuste/", json=body)
+
+        assert response.status_code == 400
