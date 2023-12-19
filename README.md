@@ -27,7 +27,8 @@
 4. **Como rodar os testes**
     Para rodar os testes deve-se estar com o container em execução, após isso, executar o comando de testes dentro do container:
 
-    ```sudo docker exec -it tp1_app_1 pytest
+    ```bash
+    sudo docker exec -it tp1_app_1 pytest
     ```
 
 ## Estrutura do Projeto
